@@ -113,13 +113,52 @@ export default function App() {
     };
   }, [memories]);
 
-  // Sync scheduled alarms to Service Worker for background checking even when app is closed
+  // Sync scheduled alarms to Service Worker and IndexedDB for background checking even when app is closed
   useEffect(() => {
     syncAlarmsToServiceWorker(activeNotifications);
   }, [activeNotifications]);
 
-  // Periodic Reminder Checker (Foreground & Tab Active)
+  // Periodic Reminder Checker (Foreground, Off-thread Web Worker & Visibility Change)
   const triggeredIdsRef = useRef<Set<string>>(new Set());
+
+  // Listen for due alarms from dedicated background worker
+  useEffect(() => {
+    const handleDueAlarm = (e: Event) => {
+      const custom = e as CustomEvent<{ item: MemoryItem }>;
+      const due = custom.detail?.item;
+      if (due && !triggeredIdsRef.current.has(due.id)) {
+        triggeredIdsRef.current.add(due.id);
+        setAlarmModalItem(due);
+        setIsAlarmModalOpen(true);
+        triggerPhoneNotification(due);
+      }
+    };
+
+    window.addEventListener('MEMORY_DUE_ALARM', handleDueAlarm);
+    return () => {
+      window.removeEventListener('MEMORY_DUE_ALARM', handleDueAlarm);
+    };
+  }, []);
+
+  // Check on tab visibility change (e.g. user unlocks phone or switches back)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        const now = Date.now();
+        const dueNotif = activeNotifications.find(
+          (m) => m.notifyAt && m.notifyAt <= now && !triggeredIdsRef.current.has(m.id)
+        );
+        if (dueNotif) {
+          triggeredIdsRef.current.add(dueNotif.id);
+          setAlarmModalItem(dueNotif);
+          setIsAlarmModalOpen(true);
+          triggerPhoneNotification(dueNotif);
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [activeNotifications]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -137,7 +176,7 @@ export default function App() {
         // Hardware Phone Notification + Physical Vibration ([징- 징- 징징징])
         triggerPhoneNotification(dueNotif);
       }
-    }, 4000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [activeNotifications]);

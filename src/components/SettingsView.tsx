@@ -3,6 +3,10 @@ import {
   getNotificationPermissionState,
   requestNotificationPermission,
   testPhoneAlarmAndVibration,
+  schedule10SecBackgroundTest,
+  isIOSDevice,
+  isStandaloneMode,
+  isAndroidDevice,
   NotificationPermissionState,
 } from '../utils/notification';
 import { MemoryItem } from '../types';
@@ -33,6 +37,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 }) => {
   const [permState, setPermState] = useState<NotificationPermissionState>('default');
   const [isTesting, setIsTesting] = useState(false);
+  const [isBgTesting, setIsBgTesting] = useState(false);
+  const [bgCountdown, setBgCountdown] = useState<number | null>(null);
+
+  // Platform detection
+  const isIOS = isIOSDevice();
+  const isAndroid = isAndroidDevice();
+  const isStandalone = isStandaloneMode();
 
   // Settings states stored in localStorage
   const [vibrationEnabled, setVibrationEnabled] = useState<boolean>(() => {
@@ -111,6 +122,27 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       setTimeout(() => {
         onTriggerTestAlarm();
       }, 500);
+    }
+  };
+
+  const handleRunBackgroundTest = async () => {
+    setIsBgTesting(true);
+    const result = await schedule10SecBackgroundTest();
+    setIsBgTesting(false);
+    onShowToast(result.message);
+    setPermState(getNotificationPermissionState());
+
+    if (result.success) {
+      setBgCountdown(10);
+      const timer = setInterval(() => {
+        setBgCountdown((prev) => {
+          if (prev === null || prev <= 1) {
+            clearInterval(timer);
+            return null;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
   };
 
@@ -352,18 +384,72 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
           </div>
 
-          {/* Test Button */}
-          <button
-            type="button"
-            disabled={isTesting}
-            onClick={handleRunTest}
-            className="w-full py-3 rounded-2xl bg-[#1b1c1a] hover:bg-[#333330] active:scale-98 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 mt-1"
-          >
-            <span className="material-symbols-outlined text-[17px] text-[#f78f10]">
-              vibration
-            </span>
-            {isTesting ? '테스트 실행 중...' : '알림 & 진동 즉시 테스트하기'}
-          </button>
+          {/* Test Buttons (Instant + 10s Background Exit Test) */}
+          <div className="grid grid-cols-2 gap-2 mt-1">
+            <button
+              type="button"
+              disabled={isTesting}
+              onClick={handleRunTest}
+              className="py-3 px-2 rounded-2xl bg-[#1b1c1a] hover:bg-[#333330] active:scale-98 text-white font-bold text-xs shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-[17px] text-[#f78f10]">
+                vibration
+              </span>
+              {isTesting ? '실행 중...' : '즉시 알림·진동 테스트'}
+            </button>
+
+            <button
+              type="button"
+              disabled={isBgTesting || bgCountdown !== null}
+              onClick={handleRunBackgroundTest}
+              className="py-3 px-2 rounded-2xl bg-[#f78f10] hover:bg-[#e07c08] active:scale-98 text-white font-bold text-xs shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-[17px]">
+                notifications_paused
+              </span>
+              {bgCountdown !== null ? `나가기 대기 (${bgCountdown}초)` : '앱 나가기 테스트 (10초)'}
+            </button>
+          </div>
+
+          {bgCountdown !== null && (
+            <div className="p-3 rounded-2xl bg-[#fff8e1] border border-[#ffe082] text-xs text-[#8e4f00] flex items-center gap-2 animate-pulse">
+              <span className="material-symbols-outlined text-[18px]">timer</span>
+              <span><strong>지금 바로 스마트폰 홈 화면으로 나가보세요!</strong> {bgCountdown}초 후 화면 알림과 진동이 울립니다.</span>
+            </div>
+          )}
+
+          {/* Mobile OS Specific Background Guidance */}
+          {isIOS && !isStandalone && (
+            <div className="mt-1 p-3.5 rounded-2xl bg-[#fff3e0] border border-[#ffb74d] text-xs text-[#b26a00] flex flex-col gap-1.5">
+              <div className="flex items-center gap-1.5 font-bold text-[#e65100]">
+                <span className="material-symbols-outlined text-[18px]">apple</span>
+                아이폰(iOS) 백그라운드 알림 필수 설정
+              </div>
+              <p className="text-[11px] leading-relaxed break-keep text-[#8c4400]">
+                애플(iOS) 보안 정책상 <strong>Safari 브라우저 탭을 닫으면 백그라운드 알림이 원천 차단</strong>됩니다.
+                <br />
+                앱을 나갔을 때도 알림을 받으시려면:
+                <br />
+                1. Safari 하단 <strong>공유(네모+화살표)</strong> 버튼 터치
+                <br />
+                2. <strong>[홈 화면에 추가]</strong> 터치하여 아이콘 설치
+                <br />
+                3. 설치된 홈 화면 아이콘으로 실행하시면 앱을 닫아두어도 알림과 진동이 100% 정상 작동합니다!
+              </p>
+            </div>
+          )}
+
+          {isAndroid && (
+            <div className="mt-1 p-3.5 rounded-2xl bg-[#e8f5e9] border border-[#a5d6a7] text-xs text-[#1b5e20] flex flex-col gap-1.5">
+              <div className="flex items-center gap-1.5 font-bold text-[#2e7d32]">
+                <span className="material-symbols-outlined text-[18px]">android</span>
+                갤럭시(안드로이드) 백그라운드 알림 최적화 팁
+              </div>
+              <p className="text-[11px] leading-relaxed break-keep text-[#2e7d32]">
+                앱을 완전히 닫아두어도 정시에 확실한 알림을 받으시려면, 스마트폰 <strong>[설정] ➔ [애플리케이션] ➔ [Chrome] ➔ [배터리] ➔ '제한 없음(최적화 안 함)'</strong>으로 설정하시고 브라우저 메뉴의 <strong>[홈 화면에 추가]</strong>를 이용해주세요.
+              </p>
+            </div>
+          )}
         </section>
 
         {/* ========================================================= */}
