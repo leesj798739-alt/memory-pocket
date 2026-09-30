@@ -3,7 +3,6 @@ import {
   getNotificationPermissionState,
   requestNotificationPermission,
   testPhoneAlarmAndVibration,
-  schedule10SecBackgroundTest,
   isIOSDevice,
   isStandaloneMode,
   isAndroidDevice,
@@ -22,6 +21,7 @@ interface SettingsViewProps {
   onShowToast: (msg: string) => void;
   onOpenTrash: () => void;
   trashedCount: number;
+  onOpenTutorial: () => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
@@ -34,11 +34,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onShowToast,
   onOpenTrash,
   trashedCount,
+  onOpenTutorial,
 }) => {
   const [permState, setPermState] = useState<NotificationPermissionState>('default');
   const [isTesting, setIsTesting] = useState(false);
-  const [isBgTesting, setIsBgTesting] = useState(false);
-  const [bgCountdown, setBgCountdown] = useState<number | null>(null);
 
   // Platform detection
   const isIOS = isIOSDevice();
@@ -122,27 +121,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       setTimeout(() => {
         onTriggerTestAlarm();
       }, 500);
-    }
-  };
-
-  const handleRunBackgroundTest = async () => {
-    setIsBgTesting(true);
-    const result = await schedule10SecBackgroundTest();
-    setIsBgTesting(false);
-    onShowToast(result.message);
-    setPermState(getNotificationPermissionState());
-
-    if (result.success) {
-      setBgCountdown(10);
-      const timer = setInterval(() => {
-        setBgCountdown((prev) => {
-          if (prev === null || prev <= 1) {
-            clearInterval(timer);
-            return null;
-          }
-          return prev - 1;
-        });
-      }, 1000);
     }
   };
 
@@ -384,39 +362,18 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
           </div>
 
-          {/* Test Buttons (Instant + 10s Background Exit Test) */}
-          <div className="grid grid-cols-2 gap-2 mt-1">
-            <button
-              type="button"
-              disabled={isTesting}
-              onClick={handleRunTest}
-              className="py-3 px-2 rounded-2xl bg-[#1b1c1a] hover:bg-[#333330] active:scale-98 text-white font-bold text-xs shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
-            >
-              <span className="material-symbols-outlined text-[17px] text-[#f78f10]">
-                vibration
-              </span>
-              {isTesting ? '실행 중...' : '즉시 알림·진동 테스트'}
-            </button>
-
-            <button
-              type="button"
-              disabled={isBgTesting || bgCountdown !== null}
-              onClick={handleRunBackgroundTest}
-              className="py-3 px-2 rounded-2xl bg-[#f78f10] hover:bg-[#e07c08] active:scale-98 text-white font-bold text-xs shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
-            >
-              <span className="material-symbols-outlined text-[17px]">
-                notifications_paused
-              </span>
-              {bgCountdown !== null ? `나가기 대기 (${bgCountdown}초)` : '앱 나가기 테스트 (10초)'}
-            </button>
-          </div>
-
-          {bgCountdown !== null && (
-            <div className="p-3 rounded-2xl bg-[#fff8e1] border border-[#ffe082] text-xs text-[#8e4f00] flex items-center gap-2 animate-pulse">
-              <span className="material-symbols-outlined text-[18px]">timer</span>
-              <span><strong>지금 바로 스마트폰 홈 화면으로 나가보세요!</strong> {bgCountdown}초 후 화면 알림과 진동이 울립니다.</span>
-            </div>
-          )}
+          {/* Instant Test Button */}
+          <button
+            type="button"
+            disabled={isTesting}
+            onClick={handleRunTest}
+            className="w-full py-3 rounded-2xl bg-[#1b1c1a] hover:bg-[#333330] active:scale-98 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 mt-1"
+          >
+            <span className="material-symbols-outlined text-[17px] text-[#f78f10]">
+              vibration
+            </span>
+            {isTesting ? '테스트 실행 중...' : '알림 & 진동 즉시 테스트하기'}
+          </button>
 
           {/* Mobile OS Specific Background Guidance */}
           {isIOS && !isStandalone && (
@@ -648,12 +605,42 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </section>
 
         {/* ========================================================= */}
-        {/* 4. 앱 정보 & 모바일 PWA 안내 */}
+        {/* 4. 기억주머니 사용 설명서 (튜토리얼 다시 보기) */}
+        {/* ========================================================= */}
+        <section className="bg-white rounded-3xl p-4 shadow-sm border border-[#e9e8e4] flex flex-col gap-3">
+          <div className="flex items-center gap-2 pb-2 border-b border-[#efeeea]">
+            <div className="w-8 h-8 rounded-xl bg-[#fef0e3] text-[#f78f10] flex items-center justify-center">
+              <span className="material-symbols-outlined text-[20px]">menu_book</span>
+            </div>
+            <div>
+              <h2 className="font-bold text-[15px] text-[#1b1c1a]">기억주머니 사용 설명서</h2>
+              <p className="text-[11px] text-[#887362]">핵심 기능 및 스마트폰 알림 꿀팁 모음</p>
+            </div>
+          </div>
+
+          <p className="text-xs text-[#554335] leading-relaxed break-keep">
+            시한성 알림과 상시성 보관 활용법, 스마트폰 백그라운드 알림 수신 팁(강제 종료 금지 공지), 기본 캘린더 등록법을 언제든 다시 확인하실 수 있습니다.
+          </p>
+
+          <button
+            type="button"
+            onClick={onOpenTutorial}
+            className="w-full py-3 rounded-2xl bg-[#faf9f5] hover:bg-[#f0eee9] active:scale-98 text-[#554335] font-bold text-xs border border-[#e9e8e4] flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
+          >
+            <span className="material-symbols-outlined text-[18px] text-[#f78f10]">
+              auto_stories
+            </span>
+            사용 설명서 (튜토리얼) 다시 보기
+          </button>
+        </section>
+
+        {/* ========================================================= */}
+        {/* 5. 앱 정보 & 모바일 PWA 안내 */}
         {/* ========================================================= */}
         <section className="bg-white rounded-3xl p-4 shadow-sm border border-[#e9e8e4] flex flex-col gap-2.5 text-xs text-[#554335]">
           <div className="flex items-center justify-between pb-2 border-b border-[#efeeea]">
             <span className="font-bold text-[#1b1c1a]">기억주머니 (Memory Pocket)</span>
-            <span className="text-[11px] font-semibold text-[#887362]">v1.2.0 PWA</span>
+            <span className="text-[11px] font-semibold text-[#887362]">v1.3.0 PWA</span>
           </div>
 
           <div className="p-3 rounded-2xl bg-[#faf9f5] border border-[#efeeea] flex flex-col gap-1.5">

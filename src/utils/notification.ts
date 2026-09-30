@@ -328,69 +328,6 @@ export async function triggerPhoneNotification(alarm: MemoryItem): Promise<boole
 }
 
 /**
- * Schedule a 10-second test alarm to verify background delivery when leaving the app
- */
-export async function schedule10SecBackgroundTest(): Promise<{ success: boolean; message: string }> {
-  const perm = getNotificationPermissionState();
-
-  if (perm === 'unsupported') {
-    return {
-      success: false,
-      message: '현재 브라우저에서는 시스템 알림 API를 지원하지 않습니다.',
-    };
-  }
-
-  if (perm !== 'granted') {
-    const nextPerm = await requestNotificationPermission();
-    if (nextPerm !== 'granted') {
-      return {
-        success: false,
-        message: '알림 권한을 먼저 [허용]해 주셔야 백그라운드 알림을 받을 수 있습니다.',
-      };
-    }
-  }
-
-  const testAlarm: MemoryItem = {
-    id: `test-${Date.now()}`,
-    type: 'notification',
-    title: '📱 앱 나가기 테스트 알림 성공!',
-    desc: '앱을 나가도 스마트폰 상단 알림과 진동이 성공적으로 울립니다 📳',
-    tags: ['테스트', '백그라운드'],
-    timeLabel: '방금',
-    createdAt: Date.now(),
-    notifyAt: Date.now() + 10000, // exactly 10 seconds later
-    isCompleted: false,
-    isDeleted: false,
-  };
-
-  // Sync to Service Worker and IndexedDB
-  await syncAlarmsToServiceWorker([...lastSyncedAlarms, testAlarm]);
-
-  // Also post directly to SW
-  if ('serviceWorker' in navigator) {
-    const reg = await navigator.serviceWorker.ready;
-    if (reg.active) {
-      reg.active.postMessage({
-        type: 'TEST_BACKGROUND_ALARM',
-        alarm: {
-          id: testAlarm.id,
-          title: testAlarm.title,
-          desc: testAlarm.desc,
-          notifyAt: testAlarm.notifyAt,
-          timeLabel: testAlarm.timeLabel,
-          tags: testAlarm.tags,
-        },
-      });
-    }
-  }
-
-  return {
-    success: true,
-    message: '10초 후 테스트 알림이 예약되었습니다! 지금 바로 스마트폰 홈 화면으로 나가보세요.',
-  };
-}
-
-/**
  * Run a full notification + vibration test
  */
 export async function testPhoneAlarmAndVibration(): Promise<{ success: boolean; message: string }> {

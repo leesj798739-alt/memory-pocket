@@ -1,5 +1,6 @@
 import React from 'react';
 import { MemoryItem } from '../types';
+import { exportToPhoneCalendar } from '../utils/calendar';
 
 interface AlarmMemoModalProps {
   item: MemoryItem | null;
@@ -141,6 +142,19 @@ export const AlarmMemoModal: React.FC<AlarmMemoModalProps> = ({
           >
             <span className="material-symbols-outlined text-[18px]">check_circle</span>
             지금 확인하고 완료 내역으로 이동 ✨
+          </button>
+
+          {/* Export to Native Phone Calendar (.ics) */}
+          <button
+            type="button"
+            onClick={() => {
+              exportToPhoneCalendar(item);
+            }}
+            className="w-full py-2.5 px-3 rounded-xl bg-[#f0fdf4] hover:bg-[#dcfce7] active:scale-98 text-[#15803d] font-bold text-xs border border-[#bbf7d0] flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+            title="스마트폰 기본 캘린더/알람에 1초 등록"
+          >
+            <span className="material-symbols-outlined text-[16px]">calendar_month</span>
+            스마트폰 기본 캘린더/알람에 1초 등록 (.ics)
           </button>
 
           <div className="flex items-center gap-2">

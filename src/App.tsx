@@ -27,6 +27,7 @@ import { AlarmMemoModal } from './components/AlarmMemoModal';
 import { PinAuthModal } from './components/PinAuthModal';
 import { SecureFocusViewer } from './components/SecureFocusViewer';
 import { SettingsView } from './components/SettingsView';
+import { TutorialModal } from './components/TutorialModal';
 import { Toast } from './components/Toast';
 
 export default function App() {
@@ -40,6 +41,9 @@ export default function App() {
   const [pinModalItem, setPinModalItem] = useState<MemoryItem | null>(null);
   const [secureViewerItem, setSecureViewerItem] = useState<MemoryItem | null>(null);
   const [notifPermission, setNotifPermission] = useState<NotificationPermissionState>('default');
+  const [isTutorialOpen, setIsTutorialOpen] = useState<boolean>(() => {
+    return localStorage.getItem('memory_tutorial_seen') !== 'true';
+  });
 
   // Alarm Full Memo Modal & Highlighting
   const [alarmModalItem, setAlarmModalItem] = useState<MemoryItem | null>(null);
@@ -447,6 +451,7 @@ export default function App() {
                 onDeleteCard={handleDeleteCard}
                 onEditCard={(memo) => setEditingItem(memo)}
                 onTriggerAlarmPreview={handleTriggerAlarmPreview}
+                onShowToast={showToast}
               />
             ) : (
               <ArchiveTab
@@ -538,8 +543,15 @@ export default function App() {
           onShowToast={showToast}
           onOpenTrash={() => setView('trash')}
           trashedCount={trashedMemories.length}
+          onOpenTutorial={() => setIsTutorialOpen(true)}
         />
       )}
+
+      {/* First-Time User Tutorial & Guide Modal */}
+      <TutorialModal
+        isOpen={isTutorialOpen}
+        onClose={() => setIsTutorialOpen(false)}
+      />
 
       {/* New Memory Drawer */}
       <NewMemoryDrawer
