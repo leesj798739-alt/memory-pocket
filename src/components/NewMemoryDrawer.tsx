@@ -7,6 +7,10 @@ import {
   getAvailableCategories,
   addCustomCategory,
 } from '../utils/storage';
+import {
+  getNotificationPermissionState,
+  requestNotificationPermission,
+} from '../utils/notification';
 
 interface NewMemoryDrawerProps {
   isOpen: boolean;
@@ -210,6 +214,14 @@ export const NewMemoryDrawer: React.FC<NewMemoryDrawerProps> = ({
     }
 
     if (activeTab === 'notification') {
+      if (getNotificationPermissionState() !== 'granted') {
+        requestNotificationPermission().then((res) => {
+          if (res !== 'granted') {
+            onShowToast('스마트폰 알림 권한을 허용해야 화면 밖에서도 알림이 울립니다!');
+          }
+        });
+      }
+
       onSubmit({
         type: 'notification',
         title: title.trim(),

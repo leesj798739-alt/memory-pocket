@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { MemoryItem } from '../types';
 import { exportToPhoneCalendar } from '../utils/calendar';
 import { sound } from '../utils/sound';
+import {
+  getNotificationPermissionState,
+  requestNotificationPermission,
+  NotificationPermissionState,
+} from '../utils/notification';
 
 interface NotificationTabProps {
   memories: MemoryItem[];
@@ -24,6 +29,20 @@ export const NotificationTab: React.FC<NotificationTabProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTime, setCurrentTime] = useState<number>(() => Date.now());
+  const [permState, setPermState] = useState<NotificationPermissionState>(() => getNotificationPermissionState());
+
+  useEffect(() => {
+    setPermState(getNotificationPermissionState());
+  }, []);
+
+  const handleRequestPermission = async () => {
+    sound.playClick();
+    const res = await requestNotificationPermission();
+    setPermState(res);
+    if (res === 'granted' && onShowToast) {
+      onShowToast('스마트폰 알림 & 진동이 허용되었습니다! 🔔');
+    }
+  };
 
   // 1-second interval to update remaining countdowns in real-time
   useEffect(() => {
@@ -130,6 +149,28 @@ export const NotificationTab: React.FC<NotificationTabProps> = ({
           시한성 알림
         </span>
       </div>
+
+      {/* Permission Warning Banner if not granted */}
+      {permState !== 'granted' && (
+        <div className="mx-4 mb-3 p-3 rounded-2xl bg-[#fff8e1] border border-[#f78f10]/40 flex items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-[#fef0e3] text-[#f78f10] flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-[19px]">notifications_active</span>
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="font-bold text-xs text-[#1b1c1a]">스마트폰 상단 알림 허용 필요</span>
+              <span className="text-[11px] text-[#887362] truncate">앱을 내려놓았을 때 상단 알림·진동을 받으려면 허용하세요</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleRequestPermission}
+            className="px-3 py-1.5 rounded-xl bg-[#f78f10] hover:bg-[#e07c08] active:scale-95 text-white font-bold text-xs shrink-0 cursor-pointer shadow-xs"
+          >
+            허용하기
+          </button>
+        </div>
+      )}
 
       {/* 1-Sec Real-time Search Input for Notification memories */}
       <div className="px-4 mb-3">

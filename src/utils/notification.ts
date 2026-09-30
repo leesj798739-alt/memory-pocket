@@ -1,5 +1,6 @@
 import { MemoryItem } from '../types';
 import { sound } from './sound';
+import { keepAliveEngine } from './keepAlive';
 
 export type NotificationPermissionState = 'granted' | 'denied' | 'default' | 'unsupported';
 
@@ -7,6 +8,8 @@ export type ExtendedNotificationOptions = NotificationOptions & {
   vibrate?: number[];
   renotify?: boolean;
   requireInteraction?: boolean;
+  silent?: boolean;
+  actions?: Array<{ action: string; title: string }>;
 };
 
 let swRegistration: ServiceWorkerRegistration | null = null;
@@ -225,7 +228,14 @@ export async function syncAlarmsToServiceWorker(alarms: MemoryItem[]): Promise<v
   // 1. Persist directly to shared IndexedDB so SW can read even when woke up by OS
   await persistAlarmsToDB(activeReminders);
 
-  // 2. Post to active Service Worker controller
+  // 2. Engage background keep-alive engine if there are active pending alarms
+  if (activeReminders.length > 0) {
+    keepAliveEngine.start();
+  } else {
+    keepAliveEngine.stop();
+  }
+
+  // 3. Post to active Service Worker controller
   if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
     const post = (controller: ServiceWorker) => {
       controller.postMessage({

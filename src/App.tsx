@@ -8,6 +8,7 @@ import {
   getSampleMemories,
 } from './utils/storage';
 import { sound } from './utils/sound';
+import { keepAliveEngine } from './utils/keepAlive';
 import {
   initServiceWorker,
   getNotificationPermissionState,
@@ -120,6 +121,21 @@ export default function App() {
   // Sync scheduled alarms to Service Worker and IndexedDB for background checking even when app is closed
   useEffect(() => {
     syncAlarmsToServiceWorker(activeNotifications);
+  }, [activeNotifications]);
+
+  // Keep-alive warm up on user gesture
+  useEffect(() => {
+    const handleWarmGesture = () => {
+      if (activeNotifications.length > 0) {
+        keepAliveEngine.start();
+      }
+    };
+    window.addEventListener('click', handleWarmGesture, { passive: true });
+    window.addEventListener('touchstart', handleWarmGesture, { passive: true });
+    return () => {
+      window.removeEventListener('click', handleWarmGesture);
+      window.removeEventListener('touchstart', handleWarmGesture);
+    };
   }, [activeNotifications]);
 
   // Periodic Reminder Checker (Foreground, Off-thread Web Worker & Visibility Change)
