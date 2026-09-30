@@ -1,0 +1,6 @@
+{
+  "name": "기억주머니 - Memory Pocket",
+  "description": "시한성 기억(알림)과 상시성 기억(보관)을 깔끔하게 분리하고 챙겨주는 스마트 기억주머니",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

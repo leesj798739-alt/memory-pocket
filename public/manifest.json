@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "기억주머니 - Memory Pocket",
+  "short_name": "기억주머니",
+  "description": "시한성 기억(알림)과 상시성 기억(보관)을 깔끔하게 분리하고 챙겨주는 스마트 기억주머니",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#f78f10",
+  "background_color": "#faf9f5",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

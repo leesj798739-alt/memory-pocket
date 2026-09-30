@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f78f10" />
+      <stop offset="100%" stop-color="#d66e00" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.2" />
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
+  
+  <!-- Pocket Shape -->
+  <g filter="url(#shadow)" fill="#ffffff">
+    <!-- Pocket base -->
+    <path d="M128 176 C128 160 144 148 160 148 L352 148 C368 148 384 160 384 176 L384 288 C384 360 328 416 256 416 C184 416 128 360 128 288 Z" fill="#ffffff" fill-opacity="0.95" />
+    
+    <!-- Pocket stitching detail -->
+    <path d="M152 188 L360 188" stroke="#f78f10" stroke-width="6" stroke-linecap="round" stroke-dasharray="10 8" opacity="0.7" />
+  </g>
+
+  <!-- Bell Alarm Icon Inside Pocket -->
+  <g fill="#f78f10">
+    <path d="M256 200 C226 200 204 222 204 252 L204 296 L188 312 L188 322 L324 322 L324 312 L308 296 L308 252 C308 222 286 200 256 200 Z" />
+    <!-- Bell Top Ring -->
+    <circle cx="256" cy="186" r="10" stroke="#f78f10" stroke-width="6" fill="none" />
+    <!-- Bell Clapper -->
+    <circle cx="256" cy="336" r="14" fill="#d66e00" />
+  </g>
+
+  <!-- Sparkles / Notification Rays -->
+  <circle cx="360" cy="150" r="14" fill="#ffecb3" />
+  <circle cx="150" cy="140" r="10" fill="#ffecb3" />
+</svg>
