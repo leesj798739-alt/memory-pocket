@@ -122,11 +122,10 @@ async function scheduleNearestAlarm() {
   try {
     if ('showTrigger' in Notification.prototype && typeof TimestampTrigger !== 'undefined') {
       const title = `🔔 [기억할 시간] ${nearest.title}`;
-      const tagList = nearest.tags && nearest.tags.length > 0 ? `\n🏷️ ${nearest.tags.map((t) => '#' + t).join(' ')}` : '';
       const timeInfo = nearest.timeLabel ? ` (${nearest.timeLabel})` : '';
       const bodyText = nearest.desc
-        ? `${nearest.desc}${tagList}${timeInfo}`
-        : `기억할 시간이에요! 터치하여 메모 내용을 바로 확인하세요.${tagList}${timeInfo}`;
+        ? `${nearest.desc}${timeInfo}`
+        : `기억할 시간이에요! 터치하여 메모 내용을 바로 확인하세요.${timeInfo}`;
 
       await self.registration.showNotification(title, {
         body: bodyText,
@@ -159,11 +158,10 @@ async function scheduleNearestAlarm() {
 // Show native system interface notification with vibration
 async function showAlarmNotification(alarm) {
   const title = `🔔 [기억할 시간] ${alarm.title}`;
-  const tagList = alarm.tags && alarm.tags.length > 0 ? `\n🏷️ ${alarm.tags.map((t) => '#' + t).join(' ')}` : '';
   const timeInfo = alarm.timeLabel ? ` (${alarm.timeLabel})` : '';
   const bodyText = alarm.desc
-    ? `${alarm.desc}${tagList}${timeInfo}`
-    : `기억할 시간이에요! 터치하여 메모 내용을 바로 확인하세요.${tagList}${timeInfo}`;
+    ? `${alarm.desc}${timeInfo}`
+    : `기억할 시간이에요! 터치하여 메모 내용을 바로 확인하세요.${timeInfo}`;
 
   const options = {
     body: bodyText,

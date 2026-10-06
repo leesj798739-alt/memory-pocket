@@ -124,9 +124,8 @@ export const NotificationTab: React.FC<NotificationTabProps> = ({
     const q = searchQuery.toLowerCase().trim();
     const matchTitle = memo.title.toLowerCase().includes(q);
     const matchDesc = memo.desc?.toLowerCase().includes(q);
-    const matchTags = memo.tags.some((t) => t.toLowerCase().includes(q));
     const matchTime = memo.timeLabel?.toLowerCase().includes(q);
-    return matchTitle || matchDesc || matchTags || matchTime;
+    return matchTitle || matchDesc || matchTime;
   });
 
   return (
@@ -159,7 +158,7 @@ export const NotificationTab: React.FC<NotificationTabProps> = ({
             </div>
             <div className="flex flex-col min-w-0">
               <span className="font-bold text-xs text-[#1b1c1a]">스마트폰 상단 알림 허용 필요</span>
-              <span className="text-[11px] text-[#887362] truncate">앱을 내려놓았을 때 상단 알림·진동을 받으려면 허용하세요</span>
+              <span className="text-[11px] text-[#887362] truncate">앱을 종료했을 때 상단 알림·진동을 받으려면 허용하세요</span>
             </div>
           </div>
           <button
@@ -317,29 +316,12 @@ export const NotificationTab: React.FC<NotificationTabProps> = ({
                   </button>
                 </div>
 
-                {/* Footer: Tags and Action Buttons */}
+                {/* Footer: Action Buttons */}
                 <div
-                  className={`mt-3 pt-2.5 flex items-center justify-between text-[#887362] border-t border-[#efeeea] ${
+                  className={`mt-2.5 pt-2 flex items-center justify-end text-[#887362] border-t border-[#efeeea] ${
                     isImminent ? 'pl-1' : ''
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {memo.tags && memo.tags.length > 0 ? (
-                      memo.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2 py-0.5 rounded-md bg-[#f5f4f0] text-xs text-[#554335] font-medium"
-                        >
-                          #{tag.replace(/^#/, '')}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="px-2 py-0.5 rounded-md bg-[#f5f4f0] text-xs text-[#554335]">
-                        #기억
-                      </span>
-                    )}
-                  </div>
-
                   <div className="flex items-center gap-1.5">
                     {memo.notifyAt && memo.notifyAt > Date.now() && (
                       <button

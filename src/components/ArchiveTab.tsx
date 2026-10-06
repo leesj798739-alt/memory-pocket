@@ -30,14 +30,12 @@ export const ArchiveTab: React.FC<ArchiveTabProps> = ({
     if (memo.isLocked) {
       const matchHint = (memo.lockHint || '').toLowerCase().includes(q);
       const matchCategory = (memo.category || '').toLowerCase().includes(q);
-      const matchTags = memo.tags.some((t) => t.toLowerCase().includes(q));
-      return matchHint || matchCategory || matchTags;
+      return matchHint || matchCategory;
     }
     const matchTitle = memo.title.toLowerCase().includes(q);
     const matchDesc = memo.desc?.toLowerCase().includes(q);
     const matchCategory = memo.category?.toLowerCase().includes(q);
-    const matchTags = memo.tags.some((t) => t.toLowerCase().includes(q));
-    return matchTitle || matchDesc || matchCategory || matchTags;
+    return matchTitle || matchDesc || matchCategory;
   });
 
   const handleStartEdit = (memo: MemoryItem) => {
@@ -157,7 +155,7 @@ export const ArchiveTab: React.FC<ArchiveTabProps> = ({
                   memo.isLocked ? 'border-[#6b5c44]/30' : 'border-[#e9e8e4]'
                 } flex flex-col gap-2.5 transition-all`}
               >
-                {/* Header row: category tag & complete button */}
+                {/* Header row: category badge & complete button */}
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span
@@ -173,23 +171,10 @@ export const ArchiveTab: React.FC<ArchiveTabProps> = ({
                         </span>
                       )}
                       {memo.category && memo.category !== '없음'
-                        ? `#${memo.category}`
-                        : memo.tags && memo.tags[0]
-                        ? `#${memo.tags[0]}`
+                        ? memo.category
                         : '상시 보관'}
                     </span>
-                    {memo.tags &&
-                      memo.tags
-                        .filter((t) => t !== memo.category)
-                        .map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-1.5 py-0.5 rounded bg-[#f5f4f0] text-[#706048] font-medium text-[10px]"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
-                    {memo.isLocked && memo.category && memo.category !== '없음' && (
+                    {memo.isLocked && (
                       <span className="px-1.5 py-0.5 rounded bg-[#f2ddbe]/60 text-[10px] text-[#706048] font-semibold">
                         PIN 보호됨
                       </span>

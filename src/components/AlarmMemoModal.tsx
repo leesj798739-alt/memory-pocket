@@ -96,20 +96,6 @@ export const AlarmMemoModal: React.FC<AlarmMemoModalProps> = ({
             </div>
           )}
 
-          {/* Tag Badges */}
-          {item.tags && item.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 pt-0.5">
-              {item.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-2.5 py-1 rounded-lg bg-[#fef0e3] text-[#8e4f00] font-semibold text-xs border border-[#f78f10]/20 flex items-center gap-0.5"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          )}
-
           {/* Timestamp Info */}
           <div className="pt-2 border-t border-[#f0eee9] flex items-center justify-between text-[11px] text-[#887362]">
             <span className="flex items-center gap-1">

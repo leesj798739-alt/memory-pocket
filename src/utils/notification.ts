@@ -290,11 +290,10 @@ export async function triggerPhoneNotification(alarm: MemoryItem): Promise<boole
   }
 
   const title = `🔔 [기억할 시간] ${alarm.title}`;
-  const tagList = alarm.tags && alarm.tags.length > 0 ? `\n🏷️ ${alarm.tags.map((t) => '#' + t).join(' ')}` : '';
   const timeInfo = alarm.timeLabel ? ` (${alarm.timeLabel})` : '';
   const bodyText = alarm.desc
-    ? `${alarm.desc}${tagList}${timeInfo}`
-    : `기억할 시간이에요! 터치하여 메모 내용을 바로 확인하세요.${tagList}${timeInfo}`;
+    ? `${alarm.desc}${timeInfo}`
+    : `기억할 시간이에요! 터치하여 메모 내용을 바로 확인하세요.${timeInfo}`;
 
   const options: ExtendedNotificationOptions = {
     body: bodyText,

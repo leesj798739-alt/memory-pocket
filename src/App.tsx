@@ -549,7 +549,6 @@ export default function App() {
               type: 'notification' as const,
               title: '세탁소 패딩 맡긴 것 찾으러 가기',
               desc: '영수증 안 가져가도 폰 번호 뒷자리로 확인 가능하다고 하셨음\n퇴근길 7시 전에 들르기!',
-              tags: ['생활', '세탁'],
               createdAt: Date.now(),
               timeLabel: '지금 도래',
               notifyAt: Date.now(),

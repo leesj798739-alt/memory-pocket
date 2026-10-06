@@ -23,9 +23,8 @@ export function exportToPhoneCalendar(item: {
     const nowStr = formatICSDate(new Date());
 
     const summary = `[기억주머니] ${item.title.replace(/[\r\n]+/g, ' ')}`;
-    const tagText = item.tags && item.tags.length > 0 ? `\\n태그: ${item.tags.map((t) => '#' + t).join(' ')}` : '';
     const descText = item.desc ? item.desc.replace(/[\r\n]+/g, '\\n') : '기억주머니에서 등록된 알림 메모입니다.';
-    const fullDesc = `${descText}${tagText}\\n\\n(기억주머니 Memory Pocket)`;
+    const fullDesc = `${descText}\\n\\n(기억주머니 Memory Pocket)`;
 
     const icsContent = [
       'BEGIN:VCALENDAR',

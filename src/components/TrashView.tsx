@@ -215,9 +215,6 @@ export const TrashView: React.FC<TrashViewProps> = ({
                     >
                       {isOriginNotif ? '알림' : '보관'}
                     </span>
-                    {memo.tags?.[0] && (
-                      <span className="text-[11px] text-[#887362]">#{memo.tags[0]}</span>
-                    )}
                   </div>
 
                   <span className="px-2 py-0.5 rounded-full bg-[#ba1a1a]/10 text-[#ba1a1a] text-[10px] font-bold flex items-center gap-1">

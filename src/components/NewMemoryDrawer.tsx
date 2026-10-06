@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { TabType, NotificationMode, MemoryItem } from '../types';
 import { CalendarDatePicker } from './CalendarDatePicker';
 import {
-  getAvailableTags,
-  addCustomTag,
   getAvailableCategories,
   addCustomCategory,
 } from '../utils/storage';
@@ -42,12 +40,6 @@ export const NewMemoryDrawer: React.FC<NewMemoryDrawerProps> = ({
   const [hour, setHour] = useState<string>('03');
   const [minute, setMinute] = useState<string>('30');
 
-  // Dynamic Tags with '없음' & '추가'
-  const [availableTags, setAvailableTags] = useState<string[]>(() => getAvailableTags());
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [isAddingTag, setIsAddingTag] = useState(false);
-  const [newTagInput, setNewTagInput] = useState('');
-
   // Dynamic Categories with '없음' & '추가'
   const [availableCategories, setAvailableCategories] = useState<string[]>(() => getAvailableCategories());
   const [selectedCategory, setSelectedCategory] = useState<string>('자주 찾는 정보');
@@ -65,12 +57,8 @@ export const NewMemoryDrawer: React.FC<NewMemoryDrawerProps> = ({
     if (isOpen) {
       setTitle('');
       setDesc('');
-      setSelectedTags([]);
-      setIsAddingTag(false);
-      setNewTagInput('');
       setIsAddingCategory(false);
       setNewCategoryInput('');
-      setAvailableTags(getAvailableTags());
       setAvailableCategories(getAvailableCategories());
       setSelectedCategory('자주 찾는 정보');
       setIsPinEnabled(false);
@@ -88,27 +76,6 @@ export const NewMemoryDrawer: React.FC<NewMemoryDrawerProps> = ({
   }, [isOpen, activeTab]);
 
   if (!isOpen) return null;
-
-  // Add custom tag handler
-  const handleAddNewTag = () => {
-    const trimmed = newTagInput.replace(/^#/, '').trim();
-    if (!trimmed) {
-      onShowToast('추가할 태그 이름을 입력해주세요');
-      return;
-    }
-    if (trimmed === '없음') {
-      onShowToast("'없음'은 태그명으로 추가할 수 없습니다");
-      return;
-    }
-    const updated = addCustomTag(trimmed);
-    setAvailableTags(updated);
-    if (!selectedTags.includes(trimmed)) {
-      setSelectedTags((prev) => [...prev, trimmed]);
-    }
-    setNewTagInput('');
-    setIsAddingTag(false);
-    onShowToast(`태그 #${trimmed} 추가됨! ✨`);
-  };
 
   // Add custom category handler
   const handleAddNewCategory = () => {
@@ -142,15 +109,6 @@ export const NewMemoryDrawer: React.FC<NewMemoryDrawerProps> = ({
 
   const handleKeypadClear = () => {
     setPinBuffer('');
-  };
-
-  // Toggle tag
-  const handleTagToggle = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter((t) => t !== tag));
-    } else {
-      setSelectedTags([...selectedTags, tag]);
-    }
   };
 
   // Calculate live preview text & timestamp
@@ -226,7 +184,6 @@ export const NewMemoryDrawer: React.FC<NewMemoryDrawerProps> = ({
         type: 'notification',
         title: title.trim(),
         desc: desc.trim() || undefined,
-        tags: selectedTags,
         notifyMode,
         notifyAt: calculated.timestamp,
         timeLabel: calculated.label,
@@ -247,7 +204,6 @@ export const NewMemoryDrawer: React.FC<NewMemoryDrawerProps> = ({
         type: 'archive',
         title: title.trim(),
         desc: desc.trim() || undefined,
-        tags: selectedTags,
         category: selectedCategory === '없음' ? undefined : selectedCategory,
         isLocked: isPinEnabled,
         pin: isPinEnabled ? pinBuffer : undefined,
@@ -390,7 +346,6 @@ export const NewMemoryDrawer: React.FC<NewMemoryDrawerProps> = ({
                 <div className="flex flex-col gap-1.5 p-2 bg-[#faf9f5] rounded-xl border border-[#e9e8e4]">
                   <div className="flex items-center gap-1.5 overflow-x-auto py-1">
                     {[
-                      { label: '1분 (테스트)', min: 1 },
                       { label: '10분 뒤', min: 10 },
                       { label: '30분 뒤', min: 30 },
                       { label: '1시간 뒤', min: 60 },
@@ -446,105 +401,6 @@ export const NewMemoryDrawer: React.FC<NewMemoryDrawerProps> = ({
                   onMinuteChange={setMinute}
                 />
               )}
-
-              {/* Tag Selection Chips with '없음' & '추가' */}
-              <div className="pt-1">
-                <div className="text-[11px] font-semibold text-[#887362] mb-1 flex items-center justify-between">
-                  <span>태그 선택</span>
-                  <span className="text-[10px] text-[#887362]/80">다중 선택 가능</span>
-                </div>
-                <div className="flex items-center gap-1.5 overflow-x-auto py-1 no-scrollbar">
-                  {/* '없음' 버튼 */}
-                  <button
-                    type="button"
-                    onClick={() => setSelectedTags([])}
-                    className={`h-7 px-2.5 rounded-lg text-xs transition-all shrink-0 cursor-pointer inline-flex items-center justify-center ${
-                      selectedTags.length === 0
-                        ? 'bg-[#f78f10] text-white font-bold shadow-xs'
-                        : 'bg-[#f5f4f0] text-[#6b5c44] hover:bg-[#efeeea] font-medium'
-                    }`}
-                  >
-                    없음
-                  </button>
-
-                  {/* '+ 추가' 버튼 ('없음' 바로 우측에 위치 & 크기 완벽 일치) */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsAddingTag(!isAddingTag);
-                      setNewTagInput('');
-                    }}
-                    className={`h-7 px-2.5 rounded-lg text-xs border border-dashed transition-all shrink-0 inline-flex items-center justify-center gap-0.5 font-medium cursor-pointer ${
-                      isAddingTag
-                        ? 'bg-[#fef0e3] border-[#f78f10] text-[#8e4f00] font-bold'
-                        : 'border-[#dbc2ae] bg-[#f5f4f0]/60 text-[#6b5c44] hover:bg-[#efeeea] hover:border-[#6b5c44]'
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-[14px]">add</span>
-                    추가
-                  </button>
-
-                  {/* 태그 목록 */}
-                  {availableTags.map((tag) => {
-                    const isSelected = selectedTags.includes(tag);
-                    return (
-                      <button
-                        key={tag}
-                        type="button"
-                        onClick={() => handleTagToggle(tag)}
-                        className={`h-7 px-2.5 rounded-lg text-xs transition-all shrink-0 cursor-pointer inline-flex items-center justify-center ${
-                          isSelected
-                            ? 'bg-[#f78f10] text-white font-bold shadow-xs'
-                            : 'bg-[#f5f4f0] text-[#6b5c44] hover:text-[#1b1c1a] hover:bg-[#efeeea] font-medium'
-                        }`}
-                      >
-                        #{tag}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* 태그 추가 인라인 입력창 */}
-                {isAddingTag && (
-                  <div className="flex items-center gap-1.5 mt-2 p-1.5 bg-[#faf9f5] rounded-xl border border-[#dbc2ae] animate-in fade-in duration-150">
-                    <span className="text-xs text-[#887362] pl-1 font-bold">#</span>
-                    <input
-                      type="text"
-                      value={newTagInput}
-                      onChange={(e) => setNewTagInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleAddNewTag();
-                        } else if (e.key === 'Escape') {
-                          setIsAddingTag(false);
-                          setNewTagInput('');
-                        }
-                      }}
-                      placeholder="새 태그명 입력 후 Enter"
-                      className="flex-1 bg-white px-2.5 py-1 rounded-lg text-xs text-[#1b1c1a] border border-[#e9e8e4] focus:outline-none focus:ring-1 focus:ring-[#f78f10]"
-                      autoFocus
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddNewTag}
-                      className="px-2.5 py-1 rounded-lg bg-[#f78f10] hover:bg-[#d87c0e] text-white text-xs font-bold transition-colors cursor-pointer"
-                    >
-                      추가
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsAddingTag(false);
-                        setNewTagInput('');
-                      }}
-                      className="px-2 py-1 rounded-lg text-xs text-[#887362] hover:bg-[#e9e8e4] transition-colors cursor-pointer"
-                    >
-                      취소
-                    </button>
-                  </div>
-                )}
-              </div>
             </div>
           ) : (
             /* Archive Specific Form: Category & PIN Lock */
@@ -641,104 +497,6 @@ export const NewMemoryDrawer: React.FC<NewMemoryDrawerProps> = ({
                       onClick={() => {
                         setIsAddingCategory(false);
                         setNewCategoryInput('');
-                      }}
-                      className="px-2 py-1 rounded-lg text-xs text-[#887362] hover:bg-[#e9e8e4] transition-colors cursor-pointer"
-                    >
-                      취소
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Tag Selection Chips for Archive with '없음' & '추가' */}
-              <div className="pt-0.5">
-                <div className="text-[11px] font-semibold text-[#887362] mb-1 flex items-center justify-between">
-                  <span>추가 태그 (선택)</span>
-                  <span className="text-[10px] text-[#887362]/80">선택 안 함 가능</span>
-                </div>
-                <div className="flex items-center gap-1.5 overflow-x-auto py-1 no-scrollbar">
-                  {/* '없음' 버튼 */}
-                  <button
-                    type="button"
-                    onClick={() => setSelectedTags([])}
-                    className={`h-7 px-2.5 rounded-lg text-xs transition-all shrink-0 cursor-pointer inline-flex items-center justify-center ${
-                      selectedTags.length === 0
-                        ? 'bg-[#6b5c44] text-white font-bold shadow-xs'
-                        : 'bg-[#f5f4f0] text-[#6b5c44] hover:bg-[#efeeea] font-medium'
-                    }`}
-                  >
-                    없음
-                  </button>
-
-                  {/* '+ 추가' 버튼 ('없음' 바로 우측에 위치 & 크기 완벽 일치) */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsAddingTag(!isAddingTag);
-                      setNewTagInput('');
-                    }}
-                    className={`h-7 px-2.5 rounded-lg text-xs border border-dashed transition-all shrink-0 inline-flex items-center justify-center gap-0.5 font-medium cursor-pointer ${
-                      isAddingTag
-                        ? 'bg-[#f2ddbe]/50 border-[#6b5c44] text-[#1b1c1a] font-bold'
-                        : 'border-[#dbc2ae] bg-[#f5f4f0]/60 text-[#6b5c44] hover:bg-[#efeeea] hover:border-[#6b5c44]'
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-[14px]">add</span>
-                    추가
-                  </button>
-
-                  {/* 태그 목록 */}
-                  {availableTags.map((tag) => {
-                    const isSelected = selectedTags.includes(tag);
-                    return (
-                      <button
-                        key={tag}
-                        type="button"
-                        onClick={() => handleTagToggle(tag)}
-                        className={`h-7 px-2.5 rounded-lg text-xs transition-all shrink-0 cursor-pointer inline-flex items-center justify-center ${
-                          isSelected
-                            ? 'bg-[#6b5c44] text-white font-bold shadow-xs'
-                            : 'bg-[#f5f4f0] text-[#6b5c44] hover:text-[#1b1c1a] hover:bg-[#efeeea] font-medium'
-                        }`}
-                      >
-                        #{tag}
-                      </button>
-                    );
-                  })}
-                </div>
-                {/* 태그 추가 인라인 입력창 (보관 탭) */}
-                {isAddingTag && (
-                  <div className="flex items-center gap-1.5 mt-2 p-1.5 bg-[#faf9f5] rounded-xl border border-[#dbc2ae] animate-in fade-in duration-150">
-                    <span className="text-xs text-[#887362] pl-1 font-bold">#</span>
-                    <input
-                      type="text"
-                      value={newTagInput}
-                      onChange={(e) => setNewTagInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleAddNewTag();
-                        } else if (e.key === 'Escape') {
-                          setIsAddingTag(false);
-                          setNewTagInput('');
-                        }
-                      }}
-                      placeholder="새 태그명 입력 후 Enter"
-                      className="flex-1 bg-white px-2.5 py-1 rounded-lg text-xs text-[#1b1c1a] border border-[#e9e8e4] focus:outline-none focus:ring-1 focus:ring-[#6b5c44]"
-                      autoFocus
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddNewTag}
-                      className="px-2.5 py-1 rounded-lg bg-[#6b5c44] hover:bg-[#584c37] text-white text-xs font-bold transition-colors cursor-pointer"
-                    >
-                      추가
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsAddingTag(false);
-                        setNewTagInput('');
                       }}
                       className="px-2 py-1 rounded-lg text-xs text-[#887362] hover:bg-[#e9e8e4] transition-colors cursor-pointer"
                     >

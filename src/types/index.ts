@@ -7,7 +7,7 @@ export interface MemoryItem {
   type: 'notification' | 'archive';
   title: string;
   desc?: string;
-  tags: string[];
+  tags?: string[];
   createdAt: number;
   
   // Notification fields
