@@ -6,7 +6,7 @@ interface ArchiveTabProps {
   onCompleteCard: (item: MemoryItem) => void;
   onDeleteCard: (item: MemoryItem) => void;
   onSaveInlineEdit: (id: string, newTitle: string, newDesc?: string) => void;
-  onOpenPinModal: (item: MemoryItem) => void;
+  onOpenPinModal: (item: MemoryItem, action: 'view' | 'edit') => void;
   onShowToast: (msg: string) => void;
 }
 
@@ -41,7 +41,7 @@ export const ArchiveTab: React.FC<ArchiveTabProps> = ({
   const handleStartEdit = (memo: MemoryItem) => {
     if (memo.isLocked) {
       onShowToast('보안 메모는 인증 후 열람/수정 가능합니다 🔒');
-      onOpenPinModal(memo);
+      onOpenPinModal(memo, 'edit');
       return;
     }
     setEditingCardId(memo.id);
@@ -231,7 +231,7 @@ export const ArchiveTab: React.FC<ArchiveTabProps> = ({
                 ) : memo.isLocked ? (
                   /* Protected Secure Content: PIN 풀기 전에는 오직 lockHint 설명만 표시되고 기억 내용과 상세 메모는 **** 로 숨김 */
                   <div
-                    onClick={() => onOpenPinModal(memo)}
+                    onClick={() => onOpenPinModal(memo, 'view')}
                     className="flex items-center justify-between gap-3 py-2 px-3 -mx-1 rounded-xl bg-[#faf9f5] border border-[#dbc2ae]/60 hover:bg-[#f5f4f0] cursor-pointer transition-all group"
                   >
                     <div className="flex flex-col flex-1 min-w-0">
@@ -276,7 +276,7 @@ export const ArchiveTab: React.FC<ArchiveTabProps> = ({
                     {memo.isLocked ? (
                       <button
                         type="button"
-                        onClick={() => onOpenPinModal(memo)}
+                        onClick={() => onOpenPinModal(memo, 'view')}
                         className="text-[11px] text-[#887362] hover:text-[#1b1c1a] flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-[#efeeea] transition-colors cursor-pointer"
                         title="PIN 인증 후 복사"
                       >

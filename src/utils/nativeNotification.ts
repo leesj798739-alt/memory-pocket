@@ -4,6 +4,21 @@ import type { MemoryItem } from '../types';
 
 let nativeListenerReady = false;
 
+const REMINDER_CHANNEL_ID = 'memory_reminders_high_v1';
+
+async function ensureAndroidReminderChannel(): Promise<void> {
+  if (Capacitor.getPlatform() !== 'android') return;
+
+  await LocalNotifications.createChannel({
+    id: REMINDER_CHANNEL_ID,
+    name: '기억 알림',
+    description: '예약된 기억 알림',
+    importance: 5,
+    visibility: 1,
+    vibration: true,
+  });
+}
+
 export function isNativeApp(): boolean {
   return Capacitor.isNativePlatform();
 }
@@ -40,7 +55,11 @@ export async function requestNativeNotificationPermission(): Promise<boolean> {
 }
 
 export async function initNativeNotifications(): Promise<void> {
-  if (!isNativeApp() || nativeListenerReady) return;
+  if (!isNativeApp()) return;
+
+  await ensureAndroidReminderChannel();
+
+  if (nativeListenerReady) return;
 
   nativeListenerReady = true;
 
@@ -96,6 +115,7 @@ export async function syncNativeNotifications(
     const result = await LocalNotifications.schedule({
       notifications: activeReminders.map((memo) => ({
         id: toNotificationId(memo.id),
+        channelId: REMINDER_CHANNEL_ID,
 
         title: `🔔 기억주머니 - ${memo.title}`,
 
@@ -142,6 +162,7 @@ export async function showNativeNotificationNow(
       notifications: [
         {
           id: toNotificationId(`instant_${memo.id}_${Date.now()}`),
+          channelId: REMINDER_CHANNEL_ID,
 
           title: `🔔 기억주머니 - ${memo.title}`,
 

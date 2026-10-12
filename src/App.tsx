@@ -40,6 +40,7 @@ export default function App() {
   const [isNewDrawerOpen, setIsNewDrawerOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MemoryItem | null>(null);
   const [pinModalItem, setPinModalItem] = useState<MemoryItem | null>(null);
+  const [pinModalAction, setPinModalAction] = useState<'view' | 'edit'>('view');
   const [secureViewerItem, setSecureViewerItem] = useState<MemoryItem | null>(null);
   const [notifPermission, setNotifPermission] = useState<NotificationPermissionState>('default');
   const [isTutorialOpen, setIsTutorialOpen] = useState<boolean>(() => {
@@ -422,9 +423,17 @@ export default function App() {
     }, 2800);
   };
 
-  // 10. PIN Auth success -> open SecureFocusViewer
+  // 10. PIN Auth success -> open the screen requested before authentication.
   const handlePinAuthSuccess = (item: MemoryItem) => {
+    const action = pinModalAction;
     setPinModalItem(null);
+    setPinModalAction('view');
+
+    if (action === 'edit') {
+      setEditingItem(item);
+      return;
+    }
+
     setSecureViewerItem(item);
   };
 
@@ -475,7 +484,10 @@ export default function App() {
                 onCompleteCard={handleCompleteCard}
                 onDeleteCard={handleDeleteCard}
                 onSaveInlineEdit={handleSaveInlineEdit}
-                onOpenPinModal={(memo) => setPinModalItem(memo)}
+                onOpenPinModal={(memo, action) => {
+                  setPinModalAction(action);
+                  setPinModalItem(memo);
+                }}
                 onShowToast={showToast}
               />
             )}
@@ -590,7 +602,10 @@ export default function App() {
       <PinAuthModal
         item={pinModalItem}
         isOpen={!!pinModalItem}
-        onClose={() => setPinModalItem(null)}
+        onClose={() => {
+          setPinModalItem(null);
+          setPinModalAction('view');
+        }}
         onSuccess={handlePinAuthSuccess}
       />
 
