@@ -6,7 +6,7 @@ import {
   isNativeApp,
   initNativeNotifications,
   syncNativeNotifications,
-} from './nativeNotifications';
+} from './nativeNotification';
 
 export type NotificationPermissionState = 'granted' | 'denied' | 'default' | 'unsupported';
 
