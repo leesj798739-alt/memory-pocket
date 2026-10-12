@@ -2,6 +2,12 @@ import { MemoryItem } from '../types';
 import { sound } from './sound';
 import { keepAliveEngine } from './keepAlive';
 
+import {
+  isNativeApp,
+  initNativeNotifications,
+  syncNativeNotifications,
+} from './nativeNotifications';
+
 export type NotificationPermissionState = 'granted' | 'denied' | 'default' | 'unsupported';
 
 export type ExtendedNotificationOptions = NotificationOptions & {
