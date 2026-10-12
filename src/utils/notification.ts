@@ -94,6 +94,21 @@ export function isAndroidDevice(): boolean {
  * Register Service Worker for background alarm push & system notifications
  */
 export async function initServiceWorker(): Promise<ServiceWorkerRegistration | null> {
+  // Android/iOS 앱에서는 Capacitor 네이티브 알림 사용
+  if (isNativeApp()) {
+  // 예전에 Android WebView에 남은 웹용 알림 Service Worker 제거
+  if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+
+    await Promise.all(
+      registrations.map((registration) => registration.unregister())
+    );
+  }
+
+  await initNativeNotifications();
+  return null;
+}
+
   if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
     return null;
   }
@@ -219,6 +234,12 @@ export function triggerVibration(pattern: number[] = [300, 150, 300, 150, 450]):
  */
 export async function syncAlarmsToServiceWorker(alarms: MemoryItem[]): Promise<void> {
   lastSyncedAlarms = alarms;
+
+  // Android/iOS 앱에서는 OS 자체 알림으로 예약
+  if (isNativeApp()) {
+    await syncNativeNotifications(alarms);
+    return;
+  }
 
   const activeReminders = alarms
     .filter((m) => m.type === 'notification' && !m.isCompleted && !m.isDeleted && m.notifyAt && m.notifyAt > Date.now())
