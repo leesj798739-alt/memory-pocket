@@ -79,9 +79,9 @@ export const TrashView: React.FC<TrashViewProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-[#faf9f5] pb-24 animate-in fade-in duration-200">
+    <div className="flex flex-col h-full min-h-0 w-full overflow-hidden bg-[#faf9f5] animate-in fade-in duration-200">
       {/* Top Header */}
-      <header className="sticky top-0 z-30 pt-safe bg-[#faf9f5]/95 backdrop-blur-md border-b border-[#e9e8e4]/70 px-4 h-16 flex items-center justify-between">
+      <header className="shrink-0 pt-safe bg-[#faf9f5]/95 backdrop-blur-md border-b border-[#e9e8e4]/70 px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -115,7 +115,7 @@ export const TrashView: React.FC<TrashViewProps> = ({
       </header>
 
       {/* 30-Day Auto Purge Notification Banner */}
-      <div className="px-4 pt-3 pb-2">
+      <div className="shrink-0 px-4 pt-3 pb-2">
         <div className="p-3 rounded-2xl bg-[#f5f4f0] border border-[#e9e8e4] flex items-start gap-2.5 shadow-2xs">
           <span className="material-symbols-outlined text-[18px] text-[#8e4f00] shrink-0 mt-0.5">
             schedule
@@ -131,7 +131,7 @@ export const TrashView: React.FC<TrashViewProps> = ({
 
       {/* Batch Action Toolbar */}
       {trashedMemories.length > 0 && (
-        <div className="px-4 py-2 flex items-center justify-between border-b border-[#e9e8e4]/60 bg-[#faf9f5]">
+        <div className="shrink-0 px-4 py-2 flex items-center justify-between border-b border-[#e9e8e4]/60 bg-[#faf9f5]">
           {/* Select All Checkbox */}
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
@@ -171,7 +171,7 @@ export const TrashView: React.FC<TrashViewProps> = ({
       )}
 
       {/* Trashed Memory Cards List */}
-      <div className="px-4 pt-3 flex flex-col gap-3">
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 pt-3 pb-4 flex flex-col gap-3">
         {trashedMemories.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 px-4 text-center rounded-2xl bg-[#f5f4f0]/70 border border-[#e9e8e4]">
             <div className="w-14 h-14 rounded-full bg-[#efeeea] flex items-center justify-center text-[#887362] mb-3">
@@ -191,7 +191,7 @@ export const TrashView: React.FC<TrashViewProps> = ({
             return (
               <div
                 key={memo.id}
-                className={`p-3.5 rounded-2xl bg-white border transition-all shadow-xs flex flex-col gap-2.5 ${
+                className={`shrink-0 p-3.5 rounded-2xl bg-white border transition-all shadow-xs flex flex-col gap-2.5 ${
                   isChecked
                     ? 'border-[#f78f10] ring-1 ring-[#f78f10]/30'
                     : 'border-[#e9e8e4] hover:border-[#dbc2ae]'

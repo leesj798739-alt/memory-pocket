@@ -209,7 +209,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const isDenied = permState === 'denied';
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-[#faf9f5] pb-24">
+    <div className="h-full w-full overflow-y-auto bg-[#faf9f5] pb-24">
       {/* Top Header with Back Navigation */}
       <div className="sticky top-0 z-40 pt-safe bg-[#faf9f5]/95 backdrop-blur-md border-b border-[#e9e8e4]">
         <div className="h-14 px-4 flex items-center justify-between">

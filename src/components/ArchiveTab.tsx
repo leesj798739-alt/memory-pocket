@@ -85,7 +85,7 @@ export const ArchiveTab: React.FC<ArchiveTabProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full pb-28">
+    <div className="flex flex-col h-full min-h-0 w-full">
       {/* Archive Header */}
       <div className="px-4 pb-2 flex items-center justify-between">
         <div className="flex flex-col">
@@ -125,7 +125,7 @@ export const ArchiveTab: React.FC<ArchiveTabProps> = ({
       </div>
 
       {/* Memory Cards List */}
-      <div className="px-4 flex flex-col gap-3">
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-28 flex flex-col gap-3">
         {memories.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 px-4 text-center rounded-2xl bg-[#f5f4f0]/80 border border-[#e9e8e4]">
             <div className="w-14 h-14 rounded-full bg-[#efeeea] flex items-center justify-center text-[#887362] mb-3">
@@ -151,7 +151,7 @@ export const ArchiveTab: React.FC<ArchiveTabProps> = ({
             return (
               <div
                 key={memo.id}
-                className={`bg-white p-4 rounded-2xl shadow-[0_1px_3px_rgba(20,11,14,0.03),0_4px_12px_rgba(120,104,79,0.05)] border ${
+                className={`shrink-0 bg-white p-4 rounded-2xl shadow-[0_1px_3px_rgba(20,11,14,0.03),0_4px_12px_rgba(120,104,79,0.05)] border ${
                   memo.isLocked ? 'border-[#6b5c44]/30' : 'border-[#e9e8e4]'
                 } flex flex-col gap-2.5 transition-all`}
               >
@@ -185,10 +185,10 @@ export const ArchiveTab: React.FC<ArchiveTabProps> = ({
                     type="button"
                     aria-label="완료 체크"
                     onClick={() => onCompleteCard(memo)}
-                    className="w-8 h-8 rounded-full bg-[#1b1c1a] hover:bg-[#6b5c44] text-white flex items-center justify-center shadow-sm active:scale-90 transition-all cursor-pointer flex-shrink-0"
+                    className="w-9 h-9 rounded-full bg-[#1b1c1a] hover:bg-[#6b5c44] text-white flex items-center justify-center shadow-sm active:scale-90 transition-all cursor-pointer flex-shrink-0"
                     title="완료 및 보관 처리"
                   >
-                    <span className="material-symbols-outlined text-[18px] text-white">check</span>
+                    <span className="material-symbols-outlined text-[20px] text-white">check</span>
                   </button>
                 </div>
 

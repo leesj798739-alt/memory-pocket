@@ -28,9 +28,9 @@ export const CompletedView: React.FC<CompletedViewProps> = ({
   });
 
   return (
-    <div className="flex flex-col w-full min-h-screen pb-16 bg-[#faf9f5]">
+    <div className="flex flex-col h-full min-h-0 w-full overflow-hidden bg-[#faf9f5]">
       {/* Top Bar */}
-      <section className="px-4 pt-3 pb-3">
+      <section className="shrink-0 px-4 pt-3 pb-3">
         <div className="flex items-center justify-between mb-3">
           <button
             type="button"
@@ -72,7 +72,7 @@ export const CompletedView: React.FC<CompletedViewProps> = ({
       </section>
 
       {/* Filter Category Tabs (Equal 3-Way Distribution) */}
-      <section className="px-4 mb-3">
+      <section className="shrink-0 px-4 mb-3">
         <nav
           aria-label="출처별 필터"
           className="p-1 bg-[#efeeea] rounded-2xl grid grid-cols-3 gap-1 border border-[#dbc2ae]/30"
@@ -149,7 +149,7 @@ export const CompletedView: React.FC<CompletedViewProps> = ({
       </section>
 
       {/* Completed & Deleted Items Stack */}
-      <section className="px-4 flex flex-col gap-3">
+      <section className="flex-1 min-h-0 overflow-y-auto px-4 pb-3 flex flex-col gap-3">
         {filteredMemories.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center py-14 px-4 rounded-2xl bg-[#f5f4f0] border border-[#e9e8e4]">
             <div className="w-12 h-12 rounded-full bg-[#efeeea] flex items-center justify-center text-[#887362] mb-3">
@@ -177,7 +177,7 @@ export const CompletedView: React.FC<CompletedViewProps> = ({
             return (
               <article
                 key={memo.id}
-                className="p-4 rounded-2xl bg-white shadow-xs border border-[#e9e8e4] flex flex-col gap-2.5 transition-all duration-200"
+                className="shrink-0 p-4 rounded-2xl bg-white shadow-xs border border-[#e9e8e4] flex flex-col gap-2.5 transition-all duration-200"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
@@ -253,7 +253,7 @@ export const CompletedView: React.FC<CompletedViewProps> = ({
       </section>
 
       {/* Visual Delight & Assurance Banner */}
-      <section className="px-4 mt-6">
+      <section className="shrink-0 px-4 py-3 border-t border-[#e9e8e4]/70">
         <div className="p-4 rounded-2xl bg-[#f5f4f0] border border-[#e9e8e4] flex items-start gap-3 shadow-xs">
           <div className="w-8 h-8 rounded-xl bg-[#ffdcc1] flex items-center justify-center text-[#f78f10] shrink-0 mt-0.5">
             <span

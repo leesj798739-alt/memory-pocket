@@ -25,6 +25,7 @@ export const EditMemoryDrawer: React.FC<EditMemoryDrawerProps> = ({
   const [desc, setDesc] = useState('');
   const [notifyMode, setNotifyMode] = useState<NotificationMode>('relative');
   const [relativeMin, setRelativeMin] = useState(30);
+  const [customRelativeMinutes, setCustomRelativeMinutes] = useState('');
 
   // Dynamic Categories with '없음' & '추가'
   const [availableCategories, setAvailableCategories] = useState<string[]>(() => getAvailableCategories());
@@ -51,6 +52,7 @@ export const EditMemoryDrawer: React.FC<EditMemoryDrawerProps> = ({
       setTitle(item.title);
       setDesc(item.desc || '');
       setNotifyMode(item.notifyMode || (item.type === 'notification' ? 'calendar' : 'none'));
+      setCustomRelativeMinutes('');
       setSelectedCategory(item.category || '없음');
       setAvailableCategories(getAvailableCategories());
       setIsAddingCategory(false);
@@ -132,9 +134,12 @@ export const EditMemoryDrawer: React.FC<EditMemoryDrawerProps> = ({
 
     if (item.type === 'notification') {
       if (notifyMode === 'relative') {
+        const minutes = customRelativeMinutes
+          ? Math.min(999, Math.max(1, parseInt(customRelativeMinutes, 10) || relativeMin))
+          : relativeMin;
         const now = Date.now();
-        notifyAt = now + relativeMin * 60000;
-        updatedTimeLabel = `${relativeMin}분 뒤 알림`;
+        notifyAt = now + minutes * 60000;
+        updatedTimeLabel = `${minutes}분 뒤 알림`;
       } else if (notifyMode === 'calendar') {
         const target = new Date(selectedDate);
         let h = parseInt(hour, 10);
@@ -269,7 +274,10 @@ export const EditMemoryDrawer: React.FC<EditMemoryDrawerProps> = ({
                     <button
                       key={m}
                       type="button"
-                      onClick={() => setRelativeMin(m)}
+                      onClick={() => {
+                        setRelativeMin(m);
+                        setCustomRelativeMinutes('');
+                      }}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                         relativeMin === m
                           ? 'bg-[#f78f10] text-white font-bold'
@@ -279,6 +287,20 @@ export const EditMemoryDrawer: React.FC<EditMemoryDrawerProps> = ({
                       {m < 60 ? `${m}분 뒤` : `${m / 60}시간 뒤`}
                     </button>
                   ))}
+                  <div className="flex items-center gap-1 shrink-0 pl-1">
+                    <input
+                      type="number"
+                      min="1"
+                      max="999"
+                      inputMode="numeric"
+                      placeholder="직접"
+                      value={customRelativeMinutes}
+                      onChange={(e) => setCustomRelativeMinutes(e.target.value)}
+                      className="w-14 h-8 text-center rounded-lg bg-white border border-[#e9e8e4] text-xs font-medium text-[#1b1c1a] focus:outline-none focus:ring-1 focus:ring-[#f78f10]"
+                      aria-label="알림 시간 직접 입력(분)"
+                    />
+                    <span className="text-[11px] text-[#887362] whitespace-nowrap">분 뒤</span>
+                  </div>
                 </div>
               )}
 

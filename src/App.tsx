@@ -438,7 +438,7 @@ export default function App() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto min-h-screen bg-[#faf9f5] flex flex-col relative text-[#1b1c1a] shadow-xl selection:bg-[#f2ddbe]">
+    <div className="w-full max-w-md mx-auto h-[100dvh] min-h-screen overflow-hidden bg-[#faf9f5] flex flex-col relative text-[#1b1c1a] shadow-xl selection:bg-[#f2ddbe]">
       {/* Toast Feedback */}
       <Toast message={toastMessage} />
 
@@ -456,18 +456,20 @@ export default function App() {
           />
 
           {/* 2-Part Segmented Tab Switcher ("알림" / "보관") */}
-          <TabSwitcher
-            activeTab={activeTab}
-            onTabChange={(tab) => {
-              sound.playClick();
-              setActiveTab(tab);
-            }}
-            notifCount={activeNotifications.length}
-            archiveCount={activeArchives.length}
-          />
+          <div className="sticky top-0 z-20 bg-[#faf9f5]/95 backdrop-blur-sm border-b border-[#efeeea]">
+            <TabSwitcher
+              activeTab={activeTab}
+              onTabChange={(tab) => {
+                sound.playClick();
+                setActiveTab(tab);
+              }}
+              notifCount={activeNotifications.length}
+              archiveCount={activeArchives.length}
+            />
+          </div>
 
           {/* Main Feed Content */}
-          <main className="flex-1 w-full pt-1">
+          <main className="flex-1 min-h-0 w-full overflow-hidden pt-1">
             {activeTab === 'notification' ? (
               <NotificationTab
                 memories={activeNotifications}

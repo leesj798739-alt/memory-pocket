@@ -4,7 +4,9 @@ import type { MemoryItem } from '../types';
 
 let nativeListenerReady = false;
 
-const REMINDER_CHANNEL_ID = 'memory_reminders_high_v1';
+// Android 알림 채널의 중요도·잠금화면 공개 여부는 만든 뒤 변경할 수 없어서,
+// 기존 채널 설정이 남아 있지 않도록 새 공개 채널을 사용한다.
+const REMINDER_CHANNEL_ID = 'memory_reminders_high_v2';
 
 async function ensureAndroidReminderChannel(): Promise<void> {
   if (Capacitor.getPlatform() !== 'android') return;
@@ -16,6 +18,7 @@ async function ensureAndroidReminderChannel(): Promise<void> {
     importance: 5,
     visibility: 1,
     vibration: true,
+    lights: true,
   });
 }
 

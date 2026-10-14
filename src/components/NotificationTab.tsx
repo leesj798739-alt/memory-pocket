@@ -129,7 +129,7 @@ export const NotificationTab: React.FC<NotificationTabProps> = ({
   });
 
   return (
-    <div className="flex flex-col w-full pb-28">
+    <div className="flex flex-col h-full min-h-0 w-full">
       {/* Notification Header (보관 기억과 동일한 디자인 & 타이틀) */}
       <div className="px-4 pb-2 flex items-center justify-between">
         <div className="flex flex-col">
@@ -198,7 +198,10 @@ export const NotificationTab: React.FC<NotificationTabProps> = ({
       </div>
 
       {/* Central Memory Cards List */}
-      <div className="px-4 flex flex-col gap-3" id="memory-cards-container">
+      <div
+        className="flex-1 min-h-0 overflow-y-auto px-4 pb-28 flex flex-col gap-3"
+        id="memory-cards-container"
+      >
         {memories.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 px-4 text-center rounded-2xl bg-[#f5f4f0]/80 border border-[#e9e8e4]">
             <div className="w-14 h-14 rounded-full bg-[#efeeea] flex items-center justify-center text-[#887362] mb-3">
@@ -227,7 +230,7 @@ export const NotificationTab: React.FC<NotificationTabProps> = ({
               <div
                 key={memo.id}
                 id={`card-${memo.id}`}
-                className={`relative bg-white rounded-2xl p-4 transition-all duration-300 transform group overflow-hidden border ${
+                className={`relative shrink-0 bg-white rounded-2xl p-4 transition-all duration-300 transform group overflow-hidden border ${
                   isHighlighted
                     ? 'ring-2 ring-[#f78f10] shadow-lg shadow-[#f78f10]/20 scale-[1.01]'
                     : isImminent
