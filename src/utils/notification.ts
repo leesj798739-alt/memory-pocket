@@ -4,7 +4,10 @@ import { keepAliveEngine } from './keepAlive';
 
 import {
   isNativeApp,
+  getNativeNotificationPermissionState,
   initNativeNotifications,
+  requestNativeNotificationPermission,
+  showNativeNotificationNow,
   syncNativeNotifications,
 } from './nativeNotification';
 
@@ -186,7 +189,11 @@ function startBackgroundWorker(): void {
 /**
  * Get current notification permission state
  */
-export function getNotificationPermissionState(): NotificationPermissionState {
+export async function getNotificationPermissionState(): Promise<NotificationPermissionState> {
+  if (isNativeApp()) {
+    return getNativeNotificationPermissionState();
+  }
+
   if (typeof window === 'undefined' || !('Notification' in window)) {
     return 'unsupported';
   }
@@ -197,6 +204,11 @@ export function getNotificationPermissionState(): NotificationPermissionState {
  * Request notification permission from user and trigger vibration confirmation
  */
 export async function requestNotificationPermission(): Promise<NotificationPermissionState> {
+  if (isNativeApp()) {
+    const allowed = await requestNativeNotificationPermission();
+    return allowed ? 'granted' : 'denied';
+  }
+
   if (typeof window === 'undefined' || !('Notification' in window)) {
     return 'unsupported';
   }
@@ -311,6 +323,10 @@ export async function triggerPhoneNotification(alarm: MemoryItem): Promise<boole
   // 2. Hardware vibration: 3 vibration pulses
   triggerVibration([300, 150, 300, 150, 450]);
 
+  if (isNativeApp()) {
+    return showNativeNotificationNow(alarm);
+  }
+
   // 3. System Notification on phone interface
   if (typeof window === 'undefined' || !('Notification' in window) || Notification.permission !== 'granted') {
     return false;
@@ -367,7 +383,7 @@ export async function triggerPhoneNotification(alarm: MemoryItem): Promise<boole
  * Run a full notification + vibration test
  */
 export async function testPhoneAlarmAndVibration(): Promise<{ success: boolean; message: string }> {
-  const perm = getNotificationPermissionState();
+  const perm = await getNotificationPermissionState();
 
   if (perm === 'unsupported') {
     return {

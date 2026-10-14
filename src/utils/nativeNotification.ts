@@ -23,6 +23,23 @@ export function isNativeApp(): boolean {
   return Capacitor.isNativePlatform();
 }
 
+export async function getNativeNotificationPermissionState(): Promise<
+  'granted' | 'denied' | 'default'
+> {
+  if (!isNativeApp()) return 'default';
+
+  try {
+    const permission = await LocalNotifications.checkPermissions();
+
+    if (permission.display === 'granted') return 'granted';
+    if (permission.display === 'denied') return 'denied';
+    return 'default';
+  } catch (error) {
+    console.error('Native notification permission check error:', error);
+    return 'denied';
+  }
+}
+
 // Capacitor 알림 ID는 숫자여야 하므로
 // 기존 memo 문자열 ID를 안정적인 숫자로 변환
 function toNotificationId(value: string): number {

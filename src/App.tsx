@@ -84,7 +84,7 @@ export default function App() {
   // Initialize Service Worker & System Notification Click Handling
   useEffect(() => {
     initServiceWorker();
-    setNotifPermission(getNotificationPermissionState());
+    void getNotificationPermissionState().then(setNotifPermission);
 
     const handleNotifClick = (e: Event) => {
       const custom = e as CustomEvent<{ id?: string; openAlarmModal?: boolean }>;
@@ -537,7 +537,7 @@ export default function App() {
         <SettingsView
           onBackToMain={() => {
             setView('main');
-            setNotifPermission(getNotificationPermissionState());
+            void getNotificationPermissionState().then(setNotifPermission);
           }}
           memories={memories}
           onImportMemories={(imported) => {

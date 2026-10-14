@@ -5,11 +5,11 @@ import {
   testPhoneAlarmAndVibration,
   isIOSDevice,
   isStandaloneMode,
-  isAndroidDevice,
   NotificationPermissionState,
 } from '../utils/notification';
 import { MemoryItem } from '../types';
 import { sound } from '../utils/sound';
+import { isNativeApp } from '../utils/nativeNotification';
 
 interface SettingsViewProps {
   onBackToMain: () => void;
@@ -41,7 +41,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
   // Platform detection
   const isIOS = isIOSDevice();
-  const isAndroid = isAndroidDevice();
   const isStandalone = isStandaloneMode();
 
   // Settings states stored in localStorage
@@ -65,7 +64,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [confirmPin, setConfirmPin] = useState('');
 
   useEffect(() => {
-    setPermState(getNotificationPermissionState());
+    void getNotificationPermissionState().then(setPermState);
   }, []);
 
   const handleToggleVibration = () => {
@@ -112,10 +111,29 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
   const handleRunTest = async () => {
     setIsTesting(true);
+
+    // Android/iOS 앱에서는 브라우저 알림 테스트를 거치지 않고
+    // Capacitor 네이티브 알림을 바로 실행한다.
+    if (isNativeApp()) {
+      const permission = await requestNotificationPermission();
+      setPermState(permission);
+
+      if (permission !== 'granted') {
+        setIsTesting(false);
+        onShowToast('스마트폰 알림 권한을 허용한 뒤 다시 테스트해주세요.');
+        return;
+      }
+
+      onTriggerTestAlarm();
+      setIsTesting(false);
+      onShowToast('스마트폰 알림과 진동을 테스트했습니다.');
+      return;
+    }
+
     const result = await testPhoneAlarmAndVibration();
     setIsTesting(false);
     onShowToast(result.message);
-    setPermState(getNotificationPermissionState());
+    void getNotificationPermissionState().then(setPermState);
 
     if (onTriggerTestAlarm) {
       setTimeout(() => {
@@ -396,17 +414,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
           )}
 
-          {isAndroid && (
-            <div className="mt-1 p-3.5 rounded-2xl bg-[#e8f5e9] border border-[#a5d6a7] text-xs text-[#1b5e20] flex flex-col gap-1.5">
-              <div className="flex items-center gap-1.5 font-bold text-[#2e7d32]">
-                <span className="material-symbols-outlined text-[18px]">android</span>
-                갤럭시(안드로이드) 백그라운드 알림 최적화 팁
-              </div>
-              <p className="text-[11px] leading-relaxed break-keep text-[#2e7d32]">
-                앱을 완전히 닫아두어도 정시에 확실한 알림을 받으시려면, 스마트폰 <strong>[설정] ➔ [애플리케이션] ➔ [Chrome] ➔ [배터리] ➔ '제한 없음(최적화 안 함)'</strong>으로 설정하시고 브라우저 메뉴의 <strong>[홈 화면에 추가]</strong>를 이용해주세요.
-              </p>
-            </div>
-          )}
         </section>
 
         {/* ========================================================= */}
@@ -619,7 +626,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
 
           <p className="text-xs text-[#554335] leading-relaxed break-keep">
-            시한성 알림과 상시성 보관 활용법, 스마트폰 백그라운드 알림 수신 팁(강제 종료 금지 공지), 기본 캘린더 등록법을 언제든 다시 확인하실 수 있습니다.
+            시한성 알림과 상시성 보관 활용법, 앱을 닫은 뒤의 알림 수신 안내, 기본 캘린더 등록법을 언제든 다시 확인하실 수 있습니다.
           </p>
 
           <button
@@ -634,25 +641,24 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </button>
         </section>
 
-        {/* ========================================================= */}
-        {/* 5. 앱 정보 & 모바일 PWA 안내 */}
-        {/* ========================================================= */}
-        <section className="bg-white rounded-3xl p-4 shadow-sm border border-[#e9e8e4] flex flex-col gap-2.5 text-xs text-[#554335]">
-          <div className="flex items-center justify-between pb-2 border-b border-[#efeeea]">
-            <span className="font-bold text-[#1b1c1a]">기억주머니 (Memory Pocket)</span>
-            <span className="text-[11px] font-semibold text-[#887362]">v1.3.0 PWA</span>
-          </div>
-
-          <div className="p-3 rounded-2xl bg-[#faf9f5] border border-[#efeeea] flex flex-col gap-1.5">
-            <div className="flex items-center gap-1.5 font-bold text-[#1b1c1a]">
-              <span className="material-symbols-outlined text-[16px] text-[#f78f10]">install_mobile</span>
-              모바일 홈 화면 추가 팁
+        {!isNativeApp() && (
+          <section className="bg-white rounded-3xl p-4 shadow-sm border border-[#e9e8e4] flex flex-col gap-2.5 text-xs text-[#554335]">
+            <div className="flex items-center justify-between pb-2 border-b border-[#efeeea]">
+              <span className="font-bold text-[#1b1c1a]">기억주머니 (Memory Pocket)</span>
+              <span className="text-[11px] font-semibold text-[#887362]">v1.3.0 PWA</span>
             </div>
-            <p className="text-[11px] text-[#887362] leading-relaxed break-keep">
-              브라우저 메뉴에서 <strong>[홈 화면에 추가]</strong>를 누르시면 스마트폰 앱 형태로 설치되어, 앱을 완전히 닫아두어도 알림과 진동을 가장 확실하게 받아보실 수 있습니다.
-            </p>
-          </div>
-        </section>
+
+            <div className="p-3 rounded-2xl bg-[#faf9f5] border border-[#efeeea] flex flex-col gap-1.5">
+              <div className="flex items-center gap-1.5 font-bold text-[#1b1c1a]">
+                <span className="material-symbols-outlined text-[16px] text-[#f78f10]">install_mobile</span>
+                모바일 홈 화면 추가 팁
+              </div>
+              <p className="text-[11px] text-[#887362] leading-relaxed break-keep">
+                브라우저 메뉴에서 <strong>[홈 화면에 추가]</strong>를 누르시면 스마트폰 앱 형태로 설치되어, 앱을 완전히 닫아두어도 알림과 진동을 가장 확실하게 받아보실 수 있습니다.
+              </p>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

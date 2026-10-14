@@ -29,10 +29,10 @@ export const NotificationTab: React.FC<NotificationTabProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTime, setCurrentTime] = useState<number>(() => Date.now());
-  const [permState, setPermState] = useState<NotificationPermissionState>(() => getNotificationPermissionState());
+  const [permState, setPermState] = useState<NotificationPermissionState>('default');
 
   useEffect(() => {
-    setPermState(getNotificationPermissionState());
+    void getNotificationPermissionState().then(setPermState);
   }, []);
 
   const handleRequestPermission = async () => {

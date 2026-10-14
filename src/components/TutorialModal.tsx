@@ -19,8 +19,9 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose })
       iconBg: 'bg-[#fef0e3] text-[#f78f10]',
       content: (
         <div className="flex flex-col gap-3 text-xs leading-relaxed text-[#554335]">
-          <p className="font-semibold text-sm text-[#1b1c1a]">
-            소중한 생각과 할 일을 잊지 않도록 깔끔하게 챙겨드립니다.
+          <p className="font-semibold text-sm leading-relaxed text-[#1b1c1a] break-keep">
+            소중한 생각과 할 일을 잊지 않도록<br />
+            깔끔하게 챙겨드립니다.
           </p>
           <div className="grid grid-cols-2 gap-2 mt-1">
             <div className="p-3 rounded-2xl bg-[#faf9f5] border border-[#efeeea] flex flex-col gap-1">
@@ -47,28 +48,30 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose })
     },
     {
       badge: '중요 필독 공지 ⭐',
-      title: '스마트폰 알림을\n100% 확실하게 받는 법',
-      icon: 'notifications_paused',
-      iconBg: 'bg-[#fff3e0] text-[#e65100]',
+      title: '앱을 닫아도\n알림이 도착해요',
+      icon: 'notifications_active',
+      iconBg: 'bg-[#e8f5e9] text-[#2e7d32]',
       content: (
         <div className="flex flex-col gap-3 text-xs leading-relaxed text-[#554335]">
-          <div className="p-3.5 rounded-2xl bg-[#fff8e1] border-2 border-[#f78f10]/60 flex flex-col gap-2">
-            <div className="flex items-center gap-2 font-bold text-[#b26a00] text-[13px]">
-              <span className="material-symbols-outlined text-[20px] text-[#f78f10]">error</span>
-              앱을 '강제 종료'하지 마세요!
+          <div className="p-3.5 rounded-2xl bg-[#eef8ef] border-2 border-[#a5d6a7] flex flex-col gap-2">
+            <div className="flex items-center gap-2 font-bold text-[#1b5e20] text-[13px]">
+              <span className="material-symbols-outlined text-[20px] text-[#2e7d32]">check_circle</span>
+              최근 앱 목록에서 닫아도 괜찮아요
             </div>
             <p className="text-[12px] font-semibold text-[#1b1c1a] leading-normal break-keep">
-              사용 후 '최근 실행 앱 목록'에서 위로 쓸어올려 강제 종료(Kill)하지 마시고, <span className="text-[#e65100] underline decoration-2">그냥 홈 버튼을 눌러 닫아두세요!</span>
+              최근 앱 목록에서 앱을 닫아도 예약한 알림은 정상적으로 알려드립니다.
             </p>
           </div>
           <div className="p-3 rounded-2xl bg-[#faf9f5] border border-[#efeeea] flex flex-col gap-1.5 text-[11.5px] text-[#887362]">
             <p className="flex items-center gap-1 text-[#1b1c1a] font-medium">
               <span className="material-symbols-outlined text-[16px] text-[#2e7d32]">check_circle</span>
-              홈 버튼으로 닫아두면 배터리 소모 없이 초절전 대기합니다.
+              화면이 꺼져 있거나 다른 앱을 사용할 때도 정해진 시간에 알림과 진동이 울립니다.
             </p>
-            <p className="flex items-center gap-1 text-[#1b1c1a] font-medium">
-              <span className="material-symbols-outlined text-[16px] text-[#2e7d32]">check_circle</span>
-              화면이 꺼져 있거나 다른 앱을 쓸 때도 제시간에 팝업창과 진동이 울립니다.
+            <p className="flex items-start gap-1 text-[#1b1c1a] font-medium">
+              <span className="material-symbols-outlined text-[16px] text-[#2e7d32] shrink-0 mt-0.5">check_circle</span>
+              <span className="leading-relaxed break-keep">
+                단, 설정에서 <span className="text-[#e65100] font-bold whitespace-nowrap">[강제 중지]</span>를 누르면 앱을 다시 열기 전까지 알림이 작동하지 않습니다.
+              </span>
             </p>
           </div>
         </div>

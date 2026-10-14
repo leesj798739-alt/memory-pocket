@@ -165,14 +165,14 @@ export const NewMemoryDrawer: React.FC<NewMemoryDrawerProps> = ({
 
   const calculated = getCalculatedTime();
 
-  const handleFormSubmit = () => {
+  const handleFormSubmit = async () => {
     if (!title.trim()) {
       onShowToast('기억 내용을 입력해주세요!');
       return;
     }
 
     if (activeTab === 'notification') {
-      if (getNotificationPermissionState() !== 'granted') {
+      if ((await getNotificationPermissionState()) !== 'granted') {
         requestNotificationPermission().then((res) => {
           if (res !== 'granted') {
             onShowToast('스마트폰 알림 권한을 허용해야 화면 밖에서도 알림이 울립니다!');
