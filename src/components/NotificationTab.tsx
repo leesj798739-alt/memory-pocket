@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MemoryItem } from '../types';
-import { exportToPhoneCalendar } from '../utils/calendar';
+import { calendarResultMessage, exportToPhoneCalendar } from '../utils/calendar';
 import { sound } from '../utils/sound';
 import {
   getNotificationPermissionState,
@@ -329,15 +329,13 @@ export const NotificationTab: React.FC<NotificationTabProps> = ({
                     {memo.notifyAt && memo.notifyAt > Date.now() && (
                       <button
                         type="button"
-                        onClick={() => {
+                        onClick={async () => {
                           sound.playClick();
-                          const success = exportToPhoneCalendar(memo);
-                          if (success && onShowToast) {
-                            onShowToast('스마트폰 캘린더/알람 파일이 생성되었습니다 📅');
-                          }
+                          const result = await exportToPhoneCalendar(memo);
+                          onShowToast?.(calendarResultMessage(result));
                         }}
                         className="h-7 px-2 rounded-lg bg-[#f0fdf4] hover:bg-[#dcfce7] active:scale-95 text-[#15803d] border border-[#bbf7d0] flex items-center gap-1 text-[11px] font-bold transition-all cursor-pointer shadow-2xs"
-                        title="스마트폰 기본 캘린더/알람에 1초 등록 (.ics)"
+                        title="스마트폰 캘린더에 일정 추가"
                       >
                         <span className="material-symbols-outlined text-[14px]">calendar_month</span>
                         <span>캘린더</span>

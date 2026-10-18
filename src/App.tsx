@@ -64,6 +64,32 @@ export default function App() {
     }, 2400);
   }, []);
 
+  useEffect(() => {
+    const handleAndroidBack = (event: Event) => {
+      if (editingItem) {
+        if (window.confirm('수정 중인 내용을 저장하지 않고 닫을까요?')) setEditingItem(null);
+      }
+      else if (pinModalItem) {
+        setPinModalItem(null);
+        setPinModalAction('view');
+      } else if (secureViewerItem) setSecureViewerItem(null);
+      else if (isNewDrawerOpen) {
+        if (window.confirm('작성 중인 내용을 저장하지 않고 닫을까요?')) setIsNewDrawerOpen(false);
+      }
+      else if (isTutorialOpen) {
+        localStorage.setItem('memory_tutorial_seen', 'true');
+        setIsTutorialOpen(false);
+      } else if (isAlarmModalOpen) setIsAlarmModalOpen(false);
+      else if (view !== 'main') {
+        setView('main');
+        if (view === 'settings') void getNotificationPermissionState().then(setNotifPermission);
+      } else return;
+      event.preventDefault();
+    };
+    window.addEventListener('memory-android-back', handleAndroidBack);
+    return () => window.removeEventListener('memory-android-back', handleAndroidBack);
+  }, [editingItem, pinModalItem, secureViewerItem, isNewDrawerOpen, isTutorialOpen, isAlarmModalOpen, view]);
+
   // Sync to localStorage whenever memories change and purge 30-day expired trash
   useEffect(() => {
     const unexpired = filterOutExpiredTrash(memories);
@@ -627,6 +653,7 @@ export default function App() {
         onComplete={handleCompleteCard}
         onSnooze={handleSnoozeAlarm}
         onEdit={(memo) => setEditingItem(memo)}
+        onShowToast={showToast}
       />
     </div>
   );

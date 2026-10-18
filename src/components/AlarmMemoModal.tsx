@@ -1,6 +1,6 @@
 import React from 'react';
 import { MemoryItem } from '../types';
-import { exportToPhoneCalendar } from '../utils/calendar';
+import { calendarResultMessage, exportToPhoneCalendar } from '../utils/calendar';
 
 interface AlarmMemoModalProps {
   item: MemoryItem | null;
@@ -9,6 +9,7 @@ interface AlarmMemoModalProps {
   onComplete: (item: MemoryItem) => void;
   onSnooze: (item: MemoryItem, minutes: number) => void;
   onEdit?: (item: MemoryItem) => void;
+  onShowToast: (message: string) => void;
 }
 
 export const AlarmMemoModal: React.FC<AlarmMemoModalProps> = ({
@@ -18,6 +19,7 @@ export const AlarmMemoModal: React.FC<AlarmMemoModalProps> = ({
   onComplete,
   onSnooze,
   onEdit,
+  onShowToast,
 }) => {
   if (!isOpen || !item) return null;
 
@@ -130,18 +132,23 @@ export const AlarmMemoModal: React.FC<AlarmMemoModalProps> = ({
             지금 확인하고 완료 내역으로 이동 ✨
           </button>
 
-          {/* Export to Native Phone Calendar (.ics) */}
+          {/* Open the phone calendar with the memo details */}
           <button
             type="button"
-            onClick={() => {
-              exportToPhoneCalendar(item);
+            onClick={async () => {
+              const result = await exportToPhoneCalendar(item);
+              onShowToast(calendarResultMessage(result));
             }}
             className="w-full py-2.5 px-3 rounded-xl bg-[#f0fdf4] hover:bg-[#dcfce7] active:scale-98 text-[#15803d] font-bold text-xs border border-[#bbf7d0] flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-            title="스마트폰 기본 캘린더/알람에 1초 등록"
+            title="스마트폰 캘린더에 일정 추가"
           >
             <span className="material-symbols-outlined text-[16px]">calendar_month</span>
-            스마트폰 기본 캘린더/알람에 1초 등록 (.ics)
+            스마트폰 캘린더에 일정 추가
           </button>
+
+          <p className="text-[11px] text-[#706048] text-center leading-relaxed break-keep">
+            캘린더의 기본 알림은 10분 전일 수 있어요. 저장 전 원하는 알림 시간을 확인해 주세요.
+          </p>
 
           <div className="flex items-center gap-2">
             {/* Snooze 5 minutes */}

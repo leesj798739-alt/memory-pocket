@@ -79,7 +79,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose })
     },
     {
       badge: '신규 기능',
-      title: '스마트폰 기본 캘린더에\n1초 만에 알람 등록',
+      title: '스마트폰 캘린더에\n일정 추가',
       icon: 'calendar_month',
       iconBg: 'bg-[#e8f5e9] text-[#2e7d32]',
       content: (
@@ -90,10 +90,10 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose })
           <div className="p-3 rounded-2xl bg-[#e8f5e9]/60 border border-[#a5d6a7]/60 flex flex-col gap-2">
             <div className="flex items-center gap-2 text-xs font-bold text-[#1b5e20]">
               <span className="material-symbols-outlined text-[18px]">event_available</span>
-              폰 시스템 알람과 100% 동기화
+              캘린더에서 알림 확인 후 저장
             </div>
             <p className="text-[11.5px] text-[#2e7d32] leading-relaxed break-keep">
-              터치 한 번으로 아이폰 캘린더나 갤럭시 캘린더에 즉시 등록되어, 스마트폰을 껐다 켜거나 앱이 닫혀 있어도 스마트폰 OS 자체 알람이 울려 절대 놓치지 않습니다.
+              캘린더의 기본 알림은 일정 시각이 아닌 10분 전 등으로 설정될 수 있어요. 원하는 알림 시간을 확인하고 필요하면 변경한 뒤 저장해 주세요.
             </p>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MemoryItem } from '../types';
 import { getRemainingTrashDays, formatRelativeTime } from '../utils/storage';
 
@@ -30,6 +30,17 @@ export const TrashView: React.FC<TrashViewProps> = ({
     isOpen: false,
     mode: 'single',
   });
+
+  useEffect(() => {
+    if (!confirmDialog.isOpen) return;
+    const dismissConfirmation = (event: Event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      setConfirmDialog({ isOpen: false, mode: 'single' });
+    };
+    window.addEventListener('memory-android-back', dismissConfirmation, true);
+    return () => window.removeEventListener('memory-android-back', dismissConfirmation, true);
+  }, [confirmDialog.isOpen]);
 
   const isAllSelected =
     trashedMemories.length > 0 && selectedIds.size === trashedMemories.length;
